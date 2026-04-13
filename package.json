@@ -1,6 +1,6 @@
 {
   "name": "droidperf",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Android Gradle performance auditor and auto-fixer.",
   "author": "Rudra Dave",
   "homepage": "https://github.com/rudradave1/droidperf#readme",
