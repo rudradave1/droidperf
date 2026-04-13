@@ -4,11 +4,12 @@
 const { program } = require('commander');
 const { auditCommand } = require('../src/commands/audit');
 const { fixCommand } = require('../src/commands/fix');
+const { version } = require('../package.json');
 
 program
   .name('droidperf')
   .description('Android Gradle performance auditor and auto-fixer.')
-  .version('0.1.0');
+  .version(version);
 
 program
   .command('audit')

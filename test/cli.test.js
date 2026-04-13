@@ -25,6 +25,13 @@ test('audit (no-color) reports issues for groovy fixture', async () => {
   assert.equal(res.code, 2); // has critical
 });
 
+test('--version matches package.json', async () => {
+  const pkg = require(path.join(__dirname, '..', 'package.json'));
+  const res = await runCli(['--version']);
+  assert.equal(res.stderr, '');
+  assert.equal(res.stdout.trim(), pkg.version);
+});
+
 test('audit accepts positional path argument', async () => {
   const fixture = path.join(__dirname, 'fixtures', 'groovy-basic');
   const res = await runCli(['audit', fixture, '--no-color']);
