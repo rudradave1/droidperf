@@ -6,7 +6,13 @@
 
 Android Gradle performance auditor and auto-fixer.
 
-One command finds what’s slowing your builds and wasting CI money. Another command fixes it.
+One command finds what’s slowing your builds and wasting CI money. Another command fixes it — safely.
+
+**Why teams use it**
+
+- **ROI**: turn “unknown Gradle slowness” into a concrete issues list with estimated savings per build.
+- **Trust**: preview every change via `--dry-run` unified diffs and apply only what you choose (`--only` / `--exclude`).
+- **Safety**: before writing, `fix` creates timestamped backups in `.droidperf-backup/` so rollback is a copy-paste.
 
 ## Quickstart
 
@@ -15,6 +21,12 @@ npx droidperf audit --path /path/to/your/android/project
 npx droidperf fix --path /path/to/your/android/project --dry-run
 npx droidperf fix --path /path/to/your/android/project
 ```
+
+Flutter repo? Run against the repo root and `droidperf` will automatically audit the `android/` Gradle subproject.
+
+## One-pager
+
+If you want a short “why/what/how” you can share, see [`docs/ONE_PAGER.md`](./docs/ONE_PAGER.md).
 
 ## Example output
 
@@ -54,6 +66,32 @@ Run 'droidperf fix' to apply all fixes automatically.
 npx droidperf audit --path /path/to/your/android/project
 ```
 
+- **Config (optional)**: create `.droidperfrc.json` (or `droidperf.config.json`) in your project root.
+
+```json
+{
+  "buildsPerDay": 20,
+  "recommend": { "jvmXmxMb": 4096 },
+  "rules": {
+    "enabled": {
+      "configure-on-demand": false
+    }
+  }
+}
+```
+
+You can also pass it explicitly:
+
+```bash
+npx droidperf audit --path /path/to/project --config /path/to/.droidperfrc.json
+```
+
+- **List rules** (IDs, severity, estimated savings, autofix availability):
+
+```bash
+npx droidperf audit --list-rules
+```
+
 - **Apply fixes**:
 
 ```bash
@@ -64,6 +102,13 @@ npx droidperf fix --path /path/to/your/android/project
 
 ```bash
 npx droidperf fix --path /path/to/your/android/project --dry-run
+```
+
+- **Apply only some rules**:
+
+```bash
+npx droidperf fix --path /path/to/your/android/project --only configuration-cache,build-cache --dry-run
+npx droidperf fix --path /path/to/your/android/project --exclude jvm-heap
 ```
 
 - **Machine-readable output (CI)**:
@@ -99,7 +144,7 @@ Dynamic dependency versions are reported but not auto-fixed.
 
 ## Notes
 
-- **Supported**: Gradle Groovy + Kotlin DSL, version catalogs, composite builds (`includeBuild(...)` best-effort).
+- **Supported**: Android Gradle projects (Groovy + Kotlin DSL), **KMP** (Gradle-based), version catalogs, composite builds (`includeBuild(...)` best-effort), and **Flutter Android module** (auto-detects `android/`).
 - **Guardrails**: very large files are skipped to keep scans fast and safe.
 
 ## Output formats
@@ -110,6 +155,23 @@ Dynamic dependency versions are reported but not auto-fixed.
 ## Changelog
 
 See [`CHANGELOG.md`](./CHANGELOG.md).
+
+## Contributing
+
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md).
+
+## Security
+
+See [`SECURITY.md`](./SECURITY.md).
+
+## Maintainer
+
+Maintained by **Rudra Dave**.
+
+- **Issues**: use GitHub Issues for bugs/features
+- **Security**: see [`SECURITY.md`](./SECURITY.md)
+- **Contact**: `your.email@example.com`
+- **Updates**: `https://www.linkedin.com/in/your-username/`
 
 ## Local development
 

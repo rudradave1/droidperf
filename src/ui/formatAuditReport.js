@@ -26,7 +26,7 @@ function padSeverity(sev) {
   return (sev + ' '.repeat(w)).slice(0, w);
 }
 
-function formatAuditReport({ projectPath, results, chalk }) {
+function formatAuditReport({ projectPath, results, chalk, buildsPerDay }) {
   const failing = results.filter((r) => r.status === 'fail');
   const totalSavingsSec = failing.reduce((sum, r) => sum + (r.estimatedSeconds || 0), 0);
   const savingsMin = totalSavingsSec / 60;
@@ -65,9 +65,9 @@ function formatAuditReport({ projectPath, results, chalk }) {
 
   if (failing.length) {
     lines.push('');
-    const buildsPerDay = 20;
-    const wasteMinutesPerDay = (totalSavingsSec / 60) * buildsPerDay;
-    lines.push(`Estimated waste: ${savingsMin.toFixed(1)} min/build × ${buildsPerDay} builds/day = ${wasteMinutesPerDay.toFixed(0)} min/day`);
+    const bpd = Number.isFinite(buildsPerDay) ? buildsPerDay : 20;
+    const wasteMinutesPerDay = (totalSavingsSec / 60) * bpd;
+    lines.push(`Estimated waste: ${savingsMin.toFixed(1)} min/build × ${bpd} builds/day = ${wasteMinutesPerDay.toFixed(0)} min/day`);
     lines.push('');
     lines.push(`Run 'droidperf fix' to apply all fixes automatically.`);
   }

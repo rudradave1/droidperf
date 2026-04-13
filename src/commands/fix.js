@@ -2,15 +2,32 @@
 
 const path = require('path');
 const chalk = require('chalk');
-const { loadProjectFiles } = require('../project/loadProjectFiles');
 const { runRules } = require('../rules/runRules');
 const { applyFixes } = require('../rules/applyFixes');
 const { formatFixReport } = require('../ui/formatFixReport');
+const { loadDroidperfConfig } = require('../config/loadConfig');
+const { resolveGradleProjectPath } = require('../project/resolveGradleProjectPath');
 
-async function fixCommand({ projectPath, dryRun, json, color }) {
+function parseCsvIds(v) {
+  if (!v) return null;
+  const parts = String(v)
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return parts.length ? new Set(parts) : null;
+}
+
+async function fixCommand({ projectPath, dryRun, json, color, only, exclude, configPath }) {
   const absProjectPath = path.resolve(projectPath);
-  const project = await loadProjectFiles(absProjectPath);
-  const results = runRules(project);
+  const resolved = await resolveGradleProjectPath(absProjectPath);
+  const cfg = await loadDroidperfConfig(resolved.resolvedPath, configPath);
+  const project = resolved.project;
+  let results = runRules(project, { config: cfg.config });
+
+  const onlySet = parseCsvIds(only);
+  const excludeSet = parseCsvIds(exclude);
+  if (onlySet) results = results.filter((r) => onlySet.has(r.id));
+  if (excludeSet) results = results.filter((r) => !excludeSet.has(r.id));
 
   const applied = await applyFixes({
     project,
@@ -23,7 +40,9 @@ async function fixCommand({ projectPath, dryRun, json, color }) {
     console.log(
       JSON.stringify(
         {
-          projectPath: absProjectPath,
+          projectPath: resolved.resolvedPath,
+          inferred: resolved.inferred || null,
+          configPath: cfg.path,
           dryRun: Boolean(dryRun),
           results,
           applied,

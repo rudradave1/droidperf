@@ -2,21 +2,34 @@
 
 const path = require('path');
 const chalk = require('chalk');
-const { loadProjectFiles } = require('../project/loadProjectFiles');
 const { runRules } = require('../rules/runRules');
 const { formatAuditReport } = require('../ui/formatAuditReport');
+const { listRules } = require('../rules/listRules');
+const { loadDroidperfConfig } = require('../config/loadConfig');
+const { resolveGradleProjectPath } = require('../project/resolveGradleProjectPath');
 
-async function auditCommand({ projectPath, json, color }) {
+async function auditCommand({ projectPath, json, color, listRules: shouldListRules, configPath }) {
+  if (shouldListRules) {
+    // eslint-disable-next-line no-console
+    console.log(JSON.stringify({ rules: listRules() }, null, 2));
+    process.exitCode = 0;
+    return;
+  }
+
   const absProjectPath = path.resolve(projectPath);
-  const project = await loadProjectFiles(absProjectPath);
-  const results = runRules(project);
+  const resolved = await resolveGradleProjectPath(absProjectPath);
+  const cfg = await loadDroidperfConfig(resolved.resolvedPath, configPath);
+  const project = resolved.project;
+  const results = runRules(project, { config: cfg.config });
 
   if (json) {
     // eslint-disable-next-line no-console
     console.log(
       JSON.stringify(
         {
-          projectPath: absProjectPath,
+          projectPath: resolved.resolvedPath,
+          inferred: resolved.inferred || null,
+          configPath: cfg.path,
           results,
         },
         null,
@@ -25,7 +38,14 @@ async function auditCommand({ projectPath, json, color }) {
     );
   } else {
     // eslint-disable-next-line no-console
-    console.log(formatAuditReport({ projectPath: absProjectPath, results, chalk: color ? chalk : null }));
+    console.log(
+      formatAuditReport({
+        projectPath: resolved.resolvedPath,
+        results,
+        chalk: color ? chalk : null,
+        buildsPerDay: cfg.config.buildsPerDay,
+      })
+    );
   }
 
   const hasCritical = results.some((r) => r.status === 'fail' && r.severity === 'CRITICAL');

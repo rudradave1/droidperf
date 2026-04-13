@@ -131,13 +131,14 @@ function makeResult({ id, title, severity, estimatedSeconds, status, details, fi
   return { id, title, severity, estimatedSeconds, status, details, fix: fix || null };
 }
 
-function getRules(project) {
+function getRules(project, options = {}) {
   const parsed = project.gradleProperties ? parseGradleProperties(project.gradleProperties.text) : null;
   const prop = (k) => (parsed ? getProp(parsed, k) : null);
 
   const dynamicDeps = countDynamicDependencies(project.buildFiles);
   const jvmargs = prop('org.gradle.jvmargs');
   const xmxMb = parseXmxMbFromJvmargs(jvmargs);
+  const recommendXmxMb = options.recommend?.jvmXmxMb ?? 4096;
 
   return [
     {
@@ -218,7 +219,7 @@ function getRules(project) {
       estimatedSeconds: 20,
       title: 'JVM heap too low',
       audit() {
-        const recommendMb = 4096;
+        const recommendMb = recommendXmxMb;
         const current = xmxMb;
         const ok = current != null && current >= recommendMb;
         const currentStr = current == null ? 'unknown' : `${current}mb`;

@@ -50,3 +50,13 @@ test('audit follows includeBuild composite builds', async () => {
   assert.ok(res.stdout.includes('Dynamic dependency versions'));
 });
 
+test('audit auto-detects Flutter android/ subproject', async () => {
+  const fixture = path.join(__dirname, 'fixtures', 'flutter-repo');
+  const res = await runCli(['audit', '--path', fixture, '--no-color', '--json']);
+  assert.equal(res.stderr, '');
+  const parsed = JSON.parse(res.stdout);
+  assert.ok(parsed.projectPath.endsWith(`${path.sep}flutter-repo${path.sep}android`));
+  assert.equal(parsed.inferred?.kind, 'flutter');
+  assert.equal(res.code, 2);
+});
+
