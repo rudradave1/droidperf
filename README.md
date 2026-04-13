@@ -170,8 +170,8 @@ Maintained by **Rudra Dave**.
 
 - **Issues**: use GitHub Issues for bugs/features
 - **Security**: see [`SECURITY.md`](./SECURITY.md)
-- **Contact**: `your.email@example.com`
-- **Updates**: `https://www.linkedin.com/in/your-username/`
+- **Contact**: `rudramordan@gmail.com`
+- **Updates**: `https://www.linkedin.com/in/rudradave/`
 
 ## Local development
 
