@@ -20,6 +20,10 @@ npx droidperf fix /path/to/your/android/project
 
 Flutter repo? Point at the repo root — `droidperf` will auto-detect and audit the `android/` Gradle subproject.
 
+## ⭐ Support
+
+If you find this useful, consider starring the repo. It helps others discover it and keeps the project moving.
+
 ## One-pager
 
 If you want a short “why/what/how” you can share, see [`docs/ONE_PAGER.md`](./docs/ONE_PAGER.md).
@@ -184,3 +188,4 @@ node bin/droidperf.js audit --path /path/to/android/project --no-color
 node bin/droidperf.js fix --path /path/to/android/project --dry-run --no-color
 ```
 
+If you tried it on your project, I’d be curious what it found.
