@@ -17,9 +17,9 @@ One command finds what’s slowing your builds and wasting CI money. Another com
 ## Quickstart
 
 ```bash
-npx droidperf audit --path /path/to/your/android/project
-npx droidperf fix --path /path/to/your/android/project --dry-run
-npx droidperf fix --path /path/to/your/android/project
+npx droidperf audit /path/to/your/android/project
+npx droidperf fix /path/to/your/android/project --dry-run
+npx droidperf fix /path/to/your/android/project
 ```
 
 Flutter repo? Run against the repo root and `droidperf` will automatically audit the `android/` Gradle subproject.
@@ -63,7 +63,7 @@ Run 'droidperf fix' to apply all fixes automatically.
 - **Audit**:
 
 ```bash
-npx droidperf audit --path /path/to/your/android/project
+npx droidperf audit /path/to/your/android/project
 ```
 
 - **Config (optional)**: create `.droidperfrc.json` (or `droidperf.config.json`) in your project root.
@@ -95,27 +95,27 @@ npx droidperf audit --list-rules
 - **Apply fixes**:
 
 ```bash
-npx droidperf fix --path /path/to/your/android/project
+npx droidperf fix /path/to/your/android/project
 ```
 
 - **Preview changes (recommended first)**:
 
 ```bash
-npx droidperf fix --path /path/to/your/android/project --dry-run
+npx droidperf fix /path/to/your/android/project --dry-run
 ```
 
 - **Apply only some rules**:
 
 ```bash
-npx droidperf fix --path /path/to/your/android/project --only configuration-cache,build-cache --dry-run
-npx droidperf fix --path /path/to/your/android/project --exclude jvm-heap
+npx droidperf fix /path/to/your/android/project --only configuration-cache,build-cache --dry-run
+npx droidperf fix /path/to/your/android/project --exclude jvm-heap
 ```
 
 - **Machine-readable output (CI)**:
 
 ```bash
-npx droidperf audit --path /path/to/your/android/project --json
-npx droidperf fix --path /path/to/your/android/project --dry-run --json
+npx droidperf audit /path/to/your/android/project --json
+npx droidperf fix /path/to/your/android/project --dry-run --json
 ```
 
 ## Safety

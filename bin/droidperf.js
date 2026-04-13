@@ -12,15 +12,16 @@ program
 
 program
   .command('audit')
+  .argument('[path]', 'Project path (optional)')
   .description('Audit an Android project for build performance issues.')
   .option('--path <path>', 'Project path', process.cwd())
   .option('--config <path>', 'Path to droidperf config (JSON)')
   .option('--json', 'Output JSON', false)
   .option('--no-color', 'Disable colored output')
   .option('--list-rules', 'List available rules (JSON)')
-  .action(async (opts) => {
+  .action(async (argPath, opts) => {
     await auditCommand({
-      projectPath: opts.path,
+      projectPath: argPath || opts.path,
       configPath: opts.config,
       json: Boolean(opts.json),
       color: Boolean(opts.color),
@@ -30,6 +31,7 @@ program
 
 program
   .command('fix')
+  .argument('[path]', 'Project path (optional)')
   .description('Apply safe performance fixes to an Android project.')
   .option('--path <path>', 'Project path', process.cwd())
   .option('--config <path>', 'Path to droidperf config (JSON)')
@@ -38,9 +40,9 @@ program
   .option('--no-color', 'Disable colored output')
   .option('--only <ruleIds>', 'Comma-separated rule IDs to apply')
   .option('--exclude <ruleIds>', 'Comma-separated rule IDs to skip')
-  .action(async (opts) => {
+  .action(async (argPath, opts) => {
     await fixCommand({
-      projectPath: opts.path,
+      projectPath: argPath || opts.path,
       configPath: opts.config,
       dryRun: Boolean(opts.dryRun),
       json: Boolean(opts.json),

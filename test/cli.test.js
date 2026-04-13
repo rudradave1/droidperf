@@ -25,6 +25,14 @@ test('audit (no-color) reports issues for groovy fixture', async () => {
   assert.equal(res.code, 2); // has critical
 });
 
+test('audit accepts positional path argument', async () => {
+  const fixture = path.join(__dirname, 'fixtures', 'groovy-basic');
+  const res = await runCli(['audit', fixture, '--no-color']);
+  assert.equal(res.stderr, '');
+  assert.ok(res.stdout.includes('Scanning your Android project...'));
+  assert.equal(res.code, 2);
+});
+
 test('fix --dry-run prints unified diff and does not create backups', async () => {
   const fixture = path.join(__dirname, 'fixtures', 'groovy-basic');
   const res = await runCli(['fix', '--path', fixture, '--dry-run', '--no-color']);
