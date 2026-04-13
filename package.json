@@ -1,0 +1,45 @@
+{
+  "name": "droidperf",
+  "version": "0.1.0",
+  "description": "Android Gradle performance auditor and auto-fixer.",
+  "author": "",
+  "homepage": "",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "bugs": {
+    "url": ""
+  },
+  "license": "MIT",
+  "bin": {
+    "droidperf": "bin/droidperf.js"
+  },
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "android",
+    "gradle",
+    "performance",
+    "build",
+    "audit",
+    "cli"
+  ],
+  "files": [
+    "bin/",
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "lint": "node -c bin/droidperf.js && node -c src/commands/audit.js && node -c src/commands/fix.js"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^12.1.0",
+    "diff": "^7.0.0"
+  }
+}
