@@ -2,14 +2,14 @@
   "name": "droidperf",
   "version": "0.1.0",
   "description": "Android Gradle performance auditor and auto-fixer.",
-  "author": "",
-  "homepage": "",
+  "author": "Rudra Dave",
+  "homepage": "https://github.com/rudradave1/droidperf#readme",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "git+https://github.com/rudradave1/droidperf.git"
   },
   "bugs": {
-    "url": ""
+    "url": "https://github.com/rudradave1/droidperf/issues"
   },
   "license": "MIT",
   "bin": {
@@ -35,7 +35,8 @@
   ],
   "scripts": {
     "test": "node --test",
-    "lint": "node -c bin/droidperf.js && node -c src/commands/audit.js && node -c src/commands/fix.js"
+    "lint": "node -c bin/droidperf.js && node -c src/commands/audit.js && node -c src/commands/fix.js",
+    "prepublishOnly": "npm test && npm run -s lint"
   },
   "dependencies": {
     "chalk": "^4.1.2",
