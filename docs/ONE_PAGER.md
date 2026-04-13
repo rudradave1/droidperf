@@ -13,7 +13,7 @@ Most Android repos ship with performance switches left off. The cost isn’t abs
 
 1) **Audits** your repo for common Gradle build-time misconfigurations.
 2) **Estimates savings** per build.
-3) **Fixes safely** (with backups + diffs) so you can ship it confidently.
+3) **Fixes safely** (diff first, backup on write).
 
 ## Works for
 
@@ -24,8 +24,8 @@ Most Android repos ship with performance switches left off. The cost isn’t abs
 ## Try it
 
 ```bash
-npx droidperf audit --path /path/to/your/android/project --no-color
-npx droidperf fix --path /path/to/your/android/project --dry-run --no-color
+npx droidperf audit /path/to/your/android/project --no-color
+npx droidperf fix /path/to/your/android/project --dry-run --no-color
 ```
 
 ## Customize it (teams)
@@ -43,9 +43,9 @@ Drop a `.droidperfrc.json` into your repo root to tune recommendations and disab
 ## Why it’s trustworthy
 
 - **Transparent changes**: `--dry-run` prints unified diffs of what would change.
-- **Rollback built-in**: writes create timestamped backups in `.droidperf-backup/`.
+- **Rollback built-in**: writing creates timestamped backups in `.droidperf-backup/`.
 - **Granular control**: apply only what you want (`--only`) or skip rules (`--exclude`).
-- **CI-proven**: repo includes tests and a CI workflow that runs on every PR/push.
+- **CI-backed**: tests run on every PR/push.
 
 ## What it changes (by design)
 
