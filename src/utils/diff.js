@@ -2,11 +2,10 @@
 
 const Diff = require('diff');
 
-function unifiedDiff({ filePath, beforeText, afterText }) {
+function unifiedDiff({ filePath, beforeText, afterText, context = 3 }) {
   return Diff.createTwoFilesPatch(filePath, filePath, beforeText, afterText, 'before', 'after', {
-    context: 3,
+    context,
   });
 }
 
 module.exports = { unifiedDiff };
-

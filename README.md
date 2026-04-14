@@ -50,6 +50,19 @@ Preview changes safely first:
 npx droidperf fix /path/to/your/android/project --dry-run
 ```
 
+`--dry-run` prints a full-file unified diff for every changed file, so you can see exactly what would be written.
+
+## What the community found
+
+Real results shared by people running `droidperf`:
+
+- **Rudra Dave (maintainer)**: **1.3 min/build saved** on a real project run.
+
+Community-driven latest updates:
+
+- Exact `--dry-run` output now shows full-file diffs of what will be written.
+- Added support for `kotlin.incremental.useClasspathSnapshot=true`.
+
 ## What it checks
 
 - Configuration cache disabled (CRITICAL)
@@ -139,6 +152,7 @@ cp .droidperf-backup/gradle.properties.<timestamp>.bak gradle.properties
 - `org.gradle.caching=true`
 - `org.gradle.parallel=true`
 - `kotlin.incremental=true`
+- `kotlin.incremental.useClasspathSnapshot=true`
 - `org.gradle.configureondemand=true`
 - `org.gradle.daemon=true`
 - `org.gradle.jvmargs`: updates/sets `-Xmx` (4096m) and ensures `-Dfile.encoding=UTF-8` **without deleting your existing JVM args flags**
@@ -183,4 +197,3 @@ npm install
 node bin/droidperf.js audit --path /path/to/android/project --no-color
 node bin/droidperf.js fix --path /path/to/android/project --dry-run --no-color
 ```
-

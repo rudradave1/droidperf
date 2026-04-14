@@ -15,6 +15,11 @@ function timestamp() {
   )}`;
 }
 
+function lineCount(text) {
+  if (!text) return 0;
+  return String(text).split(/\r?\n/).length;
+}
+
 async function backupFile({ projectPath, filePath, content }) {
   const backupDir = path.join(projectPath, '.droidperf-backup');
   await ensureDir(backupDir);
@@ -81,6 +86,8 @@ async function applyFixes({ project, results, dryRun }) {
         filePath: path.relative(project.projectPath, gradleProps.path) || 'gradle.properties',
         beforeText,
         afterText,
+        // For --dry-run, show complete file-level diff so users can see exactly what would be written.
+        context: dryRun ? Math.max(lineCount(beforeText), lineCount(afterText)) : 3,
       })
     );
   }
@@ -89,4 +96,3 @@ async function applyFixes({ project, results, dryRun }) {
 }
 
 module.exports = { applyFixes };
-

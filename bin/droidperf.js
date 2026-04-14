@@ -8,7 +8,7 @@ const { version } = require('../package.json');
 
 program
   .name('droidperf')
-  .description('Android Gradle performance auditor and auto-fixer.')
+  .description('Android build performance audit tool')
   .version(version);
 
 program
@@ -20,6 +20,7 @@ program
   .option('--json', 'Output JSON', false)
   .option('--no-color', 'Disable colored output')
   .option('--list-rules', 'List available rules (JSON)')
+  .option('--ci', 'Run in CI mode (fail build if performance misconfigurations detected)')
   .action(async (argPath, opts) => {
     await auditCommand({
       projectPath: argPath || opts.path,
@@ -27,6 +28,7 @@ program
       json: Boolean(opts.json),
       color: Boolean(opts.color),
       listRules: Boolean(opts.listRules),
+      ci: Boolean(opts.ci),
     });
   });
 
@@ -41,6 +43,7 @@ program
   .option('--no-color', 'Disable colored output')
   .option('--only <ruleIds>', 'Comma-separated rule IDs to apply')
   .option('--exclude <ruleIds>', 'Comma-separated rule IDs to skip')
+  .option('--measure', 'Measure BEFORE and AFTER build times')
   .action(async (argPath, opts) => {
     await fixCommand({
       projectPath: argPath || opts.path,
@@ -50,6 +53,7 @@ program
       color: Boolean(opts.color),
       only: opts.only,
       exclude: opts.exclude,
+      measure: Boolean(opts.measure),
     });
   });
 

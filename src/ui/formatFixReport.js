@@ -7,7 +7,15 @@ function severityRank(sev) {
   return 3;
 }
 
-function formatFixReport({ projectPath, results, applied, dryRun, chalk }) {
+function formatTimeExact(ms) {
+  const sec = Math.round(ms / 1000);
+  if (sec < 60) return `${sec}s`;
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${m}m ${s}s`;
+}
+
+function formatFixReport({ projectPath, results, applied, dryRun, chalk, measureDetails }) {
   const failing = results.filter((r) => r.status === 'fail');
   const fixedRuleIds = new Set(applied.applied.map((a) => a.ruleId));
 
@@ -36,6 +44,22 @@ function formatFixReport({ projectPath, results, applied, dryRun, chalk }) {
           : chalk.cyanBright(`[${status}]`)
       : `[${status}]`;
     lines.push(`${label} ${r.title}`);
+  }
+
+  if (measureDetails && measureDetails.baselineTime > 0) {
+    lines.push('');
+    lines.push(`Baseline build: ${formatTimeExact(measureDetails.baselineTime)}`);
+    lines.push(`After fixes: ${formatTimeExact(measureDetails.afterTime)}`);
+    lines.push('');
+    const savedMs = Math.max(0, measureDetails.baselineTime - measureDetails.afterTime);
+    const pct = measureDetails.baselineTime > 0 ? Math.round((savedMs / measureDetails.baselineTime) * 100) : 0;
+    
+    if (savedMs > 0) {
+      const savedText = `Saved: ${formatTimeExact(savedMs)} per build (~${pct}%)`;
+      lines.push(chalk ? chalk.greenBright(chalk.bold(savedText)) : savedText);
+    } else {
+      lines.push('No measurable time saved on this run.');
+    }
   }
 
   if (backups.length) {

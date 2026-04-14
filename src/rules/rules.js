@@ -140,6 +140,30 @@ function getRules(project, options = {}) {
   const xmxMb = parseXmxMbFromJvmargs(jvmargs);
   const recommendXmxMb = options.recommend?.jvmXmxMb ?? 4096;
 
+  // Analysis for advanced rules
+  let hasKapt = false;
+  let hasUnoptimizedDebug = false;
+  
+  for (const f of project.buildFiles) {
+    if (!f.text) continue;
+    // Check for KAPT
+    if (f.text.includes('kotlin-kapt') || f.text.includes('org.jetbrains.kotlin.kapt')) {
+      hasKapt = true;
+    }
+    // Check for unoptimized debug (e.g. debug block exists but missing crunchPngs = false)
+    if (f.text.includes('debug {')) {
+      const debugBlockMatch = f.text.match(/debug\s*{([^}]*)}/);
+      if (debugBlockMatch) {
+        const block = debugBlockMatch[1];
+        if (block.includes('minifyEnabled true') || block.includes('isMinifyEnabled = true')) {
+          hasUnoptimizedDebug = true; // Minifying debug builds kills performance
+        }
+      }
+    }
+  }
+
+  const moduleCount = project.buildFiles.filter(f => f.path.endsWith('build.gradle') || f.path.endsWith('build.gradle.kts')).length;
+
   return [
     {
       id: 'configuration-cache',
@@ -210,6 +234,27 @@ function getRules(project, options = {}) {
           status: enabled === true ? 'pass' : 'fail',
           details: enabled === true ? null : 'Set kotlin.incremental=true',
           fix: enabled === true ? null : { type: 'gradle.properties', set: { 'kotlin.incremental': 'true' } },
+        });
+      },
+    },
+    {
+      id: 'kotlin-classpath-snapshot',
+      severity: 'HIGH',
+      estimatedSeconds: 24,
+      title: 'Kotlin classpath snapshot incremental disabled',
+      audit() {
+        const enabled = toBool(prop('kotlin.incremental.useClasspathSnapshot'));
+        return makeResult({
+          id: this.id,
+          title: this.title,
+          severity: this.severity,
+          estimatedSeconds: this.estimatedSeconds,
+          status: enabled === true ? 'pass' : 'fail',
+          details: enabled === true ? null : 'Set kotlin.incremental.useClasspathSnapshot=true',
+          fix:
+            enabled === true
+              ? null
+              : { type: 'gradle.properties', set: { 'kotlin.incremental.useClasspathSnapshot': 'true' } },
         });
       },
     },
@@ -298,8 +343,62 @@ function getRules(project, options = {}) {
         });
       },
     },
+    {
+      id: 'kapt-usage',
+      severity: 'HIGH',
+      estimatedSeconds: 40,
+      title: 'KAPT is used instead of KSP',
+      audit() {
+        const ok = !hasKapt;
+        return makeResult({
+          id: this.id,
+          title: this.title,
+          severity: this.severity,
+          estimatedSeconds: this.estimatedSeconds,
+          status: ok ? 'pass' : 'fail',
+          details: ok ? null : 'Migrate from kotlin-kapt to KSP to speed up build significantly',
+          fix: null, 
+        });
+      },
+    },
+    {
+      id: 'unnecessary-modules',
+      severity: 'INFO',
+      estimatedSeconds: 0,
+      title: 'Large module count',
+      audit() {
+        // Just an informational warning if project has an excessive number of modules which can bloat configuration
+        const ok = moduleCount < 50;
+        return makeResult({
+          id: this.id,
+          title: this.title,
+          severity: this.severity,
+          estimatedSeconds: this.estimatedSeconds,
+          status: ok ? 'pass' : 'fail',
+          details: ok ? null : `${moduleCount} modules detected. Consider consolidating if they share tight coupling and don't benefit from parallelization.`,
+          fix: null,
+        });
+      },
+    },
+    {
+      id: 'debug-build-unoptimized',
+      severity: 'MEDIUM',
+      estimatedSeconds: 25,
+      title: 'Debug build incorrectly optimized',
+      audit() {
+        const ok = !hasUnoptimizedDebug;
+        return makeResult({
+          id: this.id,
+          title: this.title,
+          severity: this.severity,
+          estimatedSeconds: this.estimatedSeconds,
+          status: ok ? 'pass' : 'fail',
+          details: ok ? null : 'Debug build was found to have minifyEnabled set to true, which slows down iteration.',
+          fix: null,
+        });
+      },
+    },
   ];
 }
 
 module.exports = { getRules };
-

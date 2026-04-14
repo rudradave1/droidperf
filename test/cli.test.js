@@ -19,9 +19,9 @@ test('audit (no-color) reports issues for groovy fixture', async () => {
   const fixture = path.join(__dirname, 'fixtures', 'groovy-basic');
   const res = await runCli(['audit', '--path', fixture, '--no-color']);
   assert.equal(res.stderr, '');
-  assert.ok(res.stdout.includes('Scanning your Android project...'));
+  assert.ok(res.stdout.includes('Project Health Report'));
+  assert.ok(res.stdout.includes('Issues found:'));
   assert.ok(res.stdout.includes('Configuration cache disabled'));
-  assert.ok(res.stdout.includes('Dynamic dependency versions'));
   assert.equal(res.code, 2); // has critical
 });
 
@@ -36,7 +36,7 @@ test('audit accepts positional path argument', async () => {
   const fixture = path.join(__dirname, 'fixtures', 'groovy-basic');
   const res = await runCli(['audit', fixture, '--no-color']);
   assert.equal(res.stderr, '');
-  assert.ok(res.stdout.includes('Scanning your Android project...'));
+  assert.ok(res.stdout.includes('Project Health Report'));
   assert.equal(res.code, 2);
 });
 
@@ -54,15 +54,21 @@ test('fix --dry-run prints unified diff and does not create backups', async () =
 
 test('audit detects version-catalog dynamic versions', async () => {
   const fixture = path.join(__dirname, 'fixtures', 'kts-vcatalog');
-  const res = await runCli(['audit', '--path', fixture, '--no-color']);
-  assert.ok(res.stdout.includes('Dynamic dependency versions'));
+  const res = await runCli(['audit', '--path', fixture, '--no-color', '--json']);
+  const parsed = JSON.parse(res.stdout);
+  const dynamicDeps = parsed.results.find((r) => r.id === 'dynamic-deps');
+  assert.ok(dynamicDeps);
+  assert.equal(dynamicDeps.status, 'fail');
   assert.equal(res.code, 2); // configuration-cache/build-cache defaults missing -> critical
 });
 
 test('audit follows includeBuild composite builds', async () => {
   const fixture = path.join(__dirname, 'fixtures', 'composite-root');
-  const res = await runCli(['audit', '--path', fixture, '--no-color']);
-  assert.ok(res.stdout.includes('Dynamic dependency versions'));
+  const res = await runCli(['audit', '--path', fixture, '--no-color', '--json']);
+  const parsed = JSON.parse(res.stdout);
+  const dynamicDeps = parsed.results.find((r) => r.id === 'dynamic-deps');
+  assert.ok(dynamicDeps);
+  assert.equal(dynamicDeps.status, 'fail');
 });
 
 test('audit auto-detects Flutter android/ subproject', async () => {
@@ -74,4 +80,3 @@ test('audit auto-detects Flutter android/ subproject', async () => {
   assert.equal(parsed.inferred?.kind, 'flutter');
   assert.equal(res.code, 2);
 });
-

@@ -29,46 +29,49 @@ function padSeverity(sev) {
 function formatAuditReport({ projectPath, results, chalk, buildsPerDay }) {
   const failing = results.filter((r) => r.status === 'fail');
   const totalSavingsSec = failing.reduce((sum, r) => sum + (r.estimatedSeconds || 0), 0);
-  const savingsMin = totalSavingsSec / 60;
+  
+  const bpd = Number.isFinite(buildsPerDay) ? buildsPerDay : 20;
+  const wasteMinutesPerDay = (totalSavingsSec / 60) * bpd;
 
   const lines = [];
-  lines.push('Scanning your Android project...');
+  
+  const header = chalk ? chalk.bold('Project Health Report') : 'Project Health Report';
+  lines.push(header);
   lines.push('');
-  lines.push(
-    failing.length
-      ? `Found ${failing.length} issues costing you ~${savingsMin.toFixed(1)} minutes per build:`
-      : 'No issues found. Your project looks well-tuned.'
-  );
-  lines.push('');
-
-  for (const r of failing) {
-    const color = severityColor(chalk, r.severity);
-    const sev = color(`[${padSeverity(r.severity).trim()}]`);
-    const dash = '—';
-    let tail = '';
-    if (r.id === 'jvm-heap') {
-      tail = r.details ? ` ${dash} ${r.details.replace(/^Current /, '').replace(' — ', ' — ')}` : '';
-      // sample wants: "JVM heap too low (512mb) — recommend 4096mb"
-      // best-effort: just use details string
-      tail = r.details ? ` ${dash} ${r.details.replace(/^Current max heap /, '').replace(' — ', ' — ')}` : '';
-      lines.push(`${sev} ${r.title}${tail}`);
-      continue;
-    }
-    if (r.id === 'dynamic-deps') {
-      const detail = r.details ? ` found in ${r.details.replace(/^Found in /, '').replace(' module(s)', ' modules')}` : '';
-      lines.push(`${sev} ${r.title} — +${formatSecondsExact(r.estimatedSeconds)} per build${detail ? ` (${detail.trim()})` : ''}`);
-      continue;
-    }
-
-    lines.push(`${sev} ${r.title} — +${formatSecondsExact(r.estimatedSeconds)} per build`);
+  lines.push(`Issues found: ${failing.length}`);
+  if (failing.length > 0) {
+    lines.push(`Estimated time wasted/day: ${Math.round(wasteMinutesPerDay)} min`);
   }
+  lines.push('');
 
-  if (failing.length) {
+  if (failing.length === 0) {
+    lines.push('No issues found. Your project looks well-tuned.');
+  } else {
+    lines.push('Top issues:');
+    const ordered = [...failing].sort((a, b) => (b.estimatedSeconds || 0) - (a.estimatedSeconds || 0));
+    
+    // Show top 3 or 4 issues
+    const top = ordered.slice(0, 4);
+    for (const r of top) {
+      lines.push(`- ${r.title}`);
+    }
+    
+    if (ordered.length > top.length) {
+      lines.push(`- ... and ${ordered.length - top.length} more`);
+    }
+
     lines.push('');
-    const bpd = Number.isFinite(buildsPerDay) ? buildsPerDay : 20;
-    const wasteMinutesPerDay = (totalSavingsSec / 60) * bpd;
-    lines.push(`Estimated waste: ${savingsMin.toFixed(1)} min/build × ${bpd} builds/day = ${wasteMinutesPerDay.toFixed(0)} min/day`);
-    lines.push('');
+    
+    const hasCritical = failing.some(r => r.severity === 'CRITICAL');
+    const hasHigh = failing.some(r => r.severity === 'HIGH');
+    
+    let priority = 'LOW';
+    if (hasCritical) priority = 'CRITICAL';
+    else if (hasHigh) priority = 'HIGH';
+    else if (failing.some(r => r.severity === 'MEDIUM')) priority = 'MEDIUM';
+
+    const prioText = chalk ? severityColor(chalk, priority)(priority) : priority;
+    lines.push(`Recommendation: ${prioText} priority fix`);
     lines.push(`Run 'droidperf fix' to apply all fixes automatically.`);
   }
 

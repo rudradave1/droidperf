@@ -8,6 +8,8 @@ const { formatFixReport } = require('../ui/formatFixReport');
 const { loadDroidperfConfig } = require('../config/loadConfig');
 const { resolveGradleProjectPath } = require('../project/resolveGradleProjectPath');
 
+const { spawnSync } = require('child_process');
+
 function parseCsvIds(v) {
   if (!v) return null;
   const parts = String(v)
@@ -17,7 +19,15 @@ function parseCsvIds(v) {
   return parts.length ? new Set(parts) : null;
 }
 
-async function fixCommand({ projectPath, dryRun, json, color, only, exclude, configPath }) {
+function runAssembleDebug(dir) {
+  const isWin = process.platform === 'win32';
+  const cmd = isWin ? 'gradlew.bat' : './gradlew';
+  const t0 = Date.now();
+  spawnSync(cmd, ['assembleDebug'], { cwd: dir, stdio: 'ignore' });
+  return Date.now() - t0;
+}
+
+async function fixCommand({ projectPath, dryRun, json, color, only, exclude, configPath, measure }) {
   const absProjectPath = path.resolve(projectPath);
   const resolved = await resolveGradleProjectPath(absProjectPath);
   const cfg = await loadDroidperfConfig(resolved.resolvedPath, configPath);
@@ -29,11 +39,25 @@ async function fixCommand({ projectPath, dryRun, json, color, only, exclude, con
   if (onlySet) results = results.filter((r) => onlySet.has(r.id));
   if (excludeSet) results = results.filter((r) => !excludeSet.has(r.id));
 
+  let baselineTime = 0;
+  if (measure && !dryRun) {
+    // eslint-disable-next-line no-console
+    console.log(color ? chalk.cyan('Running baseline build (this may take a few minutes)...') : 'Running baseline build...');
+    baselineTime = runAssembleDebug(resolved.resolvedPath);
+  }
+
   const applied = await applyFixes({
     project,
     results,
     dryRun,
   });
+  
+  let afterTime = 0;
+  if (measure && !dryRun) {
+    // eslint-disable-next-line no-console
+    console.log(color ? chalk.cyan('Running post-fix build (this may take a few minutes)...') : 'Running post-fix build...');
+    afterTime = runAssembleDebug(resolved.resolvedPath);
+  }
 
   if (json) {
     // eslint-disable-next-line no-console
@@ -46,6 +70,7 @@ async function fixCommand({ projectPath, dryRun, json, color, only, exclude, con
           dryRun: Boolean(dryRun),
           results,
           applied,
+          measure: measure ? { baselineTime, afterTime } : null
         },
         null,
         2
@@ -53,7 +78,7 @@ async function fixCommand({ projectPath, dryRun, json, color, only, exclude, con
     );
   } else {
     // eslint-disable-next-line no-console
-    console.log(formatFixReport({ projectPath: absProjectPath, results, applied, dryRun, chalk: color ? chalk : null }));
+    console.log(formatFixReport({ projectPath: absProjectPath, results, applied, dryRun, chalk: color ? chalk : null, measureDetails: measure && !dryRun ? { baselineTime, afterTime } : null }));
   }
 
   process.exitCode = 0;

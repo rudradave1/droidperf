@@ -8,7 +8,8 @@ const { listRules } = require('../rules/listRules');
 const { loadDroidperfConfig } = require('../config/loadConfig');
 const { resolveGradleProjectPath } = require('../project/resolveGradleProjectPath');
 
-async function auditCommand({ projectPath, json, color, listRules: shouldListRules, configPath }) {
+async function auditCommand(opts) {
+  const { projectPath, json, color, listRules: shouldListRules, configPath, ci } = opts;
   if (shouldListRules) {
     // eslint-disable-next-line no-console
     console.log(JSON.stringify({ rules: listRules() }, null, 2));
@@ -49,7 +50,18 @@ async function auditCommand({ projectPath, json, color, listRules: shouldListRul
   }
 
   const hasCritical = results.some((r) => r.status === 'fail' && r.severity === 'CRITICAL');
-  process.exitCode = hasCritical ? 2 : 0;
+  const hasFailures = results.some((r) => r.status === 'fail');
+
+  if (opts.ci && hasFailures) {
+    if (color) {
+      console.error(chalk.red('\n❌ Build failed: performance misconfigurations detected'));
+    } else {
+      console.error('\n❌ Build failed: performance misconfigurations detected');
+    }
+    process.exitCode = 1;
+  } else {
+    process.exitCode = hasCritical ? 2 : 0;
+  }
 }
 
 module.exports = { auditCommand };
