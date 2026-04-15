@@ -10,6 +10,12 @@ Audit and safely fix common Gradle build-time misconfigurations in Android proje
 
 It’s designed to be boring in the best way: conservative fixes, transparent diffs, and easy rollback.
 
+## Design Philosophy
+
+- Prefer safe, reversible fixes over aggressive optimizations
+- Avoid modifying build scripts directly (only gradle.properties)
+- Focus on high-impact, low-risk improvements first
+  
 ## Quickstart
 
 ```bash
