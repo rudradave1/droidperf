@@ -1,6 +1,6 @@
 {
   "name": "droidperf",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "description": "Android build performance audit tool",
   "author": "Rudra Dave",
   "homepage": "https://github.com/rudradave1/droidperf#readme",
@@ -35,7 +35,7 @@
   ],
   "scripts": {
     "test": "node --test",
-    "lint": "node -c bin/droidperf.js && node -c src/commands/audit.js && node -c src/commands/fix.js",
+    "lint": "node -c bin/droidperf.js && find src -name '*.js' -exec node -c {} +",
     "prepublishOnly": "npm test && npm run -s lint"
   },
   "dependencies": {

@@ -14,6 +14,9 @@ npm install
 node bin/droidperf.js audit --path /path/to/android/project --no-color
 node bin/droidperf.js fix --path /path/to/android/project --dry-run --no-color
 ```
+# Test analyze command
+node bin/droidperf.js analyze --build-log ./build.log --api-key YOUR_KEY
+node bin/droidperf.js analyze --build-log ./build.log --api-key YOUR_KEY --apply --dry-run
 
 ## Tests + lint
 

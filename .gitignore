@@ -3,4 +3,5 @@ node_modules/
 .droidperf-backup/
 npm-debug.log*
 .env
-
+.droidperf/
+npmignore

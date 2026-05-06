@@ -4,6 +4,8 @@
 const { program } = require('commander');
 const { auditCommand } = require('../src/commands/audit');
 const { fixCommand } = require('../src/commands/fix');
+const { analyzeCommand } = require('../src/commands/analyze');
+const { configCommand } = require('../src/commands/config');
 const { version } = require('../package.json');
 
 program
@@ -54,6 +56,34 @@ program
       only: opts.only,
       exclude: opts.exclude,
       measure: Boolean(opts.measure),
+    });
+  });
+
+program
+  .command('config')
+  .description('Configure droidperf settings.')
+  .option('--set-key <key>', 'Set OpenRouter API key globally')
+  .action(async (opts) => {
+    await configCommand(opts);
+  });
+
+program
+  .command('analyze')
+  .description('Analyze a Gradle build log using LLM to find bottlenecks.')
+  .option('--build-log <path>', 'Path to the Gradle build log file')
+  .option('--api-key <key>', 'OpenRouter API key (optional if OPENROUTER_API_KEY env var is set)')
+  .option('--model <model>', 'LLM model to use (default: openrouter/free)')
+  .option('--apply', 'Automatically apply recommended fixes to gradle.properties', false)
+  .option('--dry-run', 'Preview fixes without writing files (use with --apply)', false)
+  .option('--no-color', 'Disable colored output')
+  .action(async (opts) => {
+    await analyzeCommand({
+      buildLog: opts.buildLog,
+      apiKey: opts.apiKey,
+      model: opts.model,
+      apply: Boolean(opts.apply),
+      dryRun: Boolean(opts.dryRun),
+      color: Boolean(opts.color),
     });
   });
 

@@ -8,6 +8,12 @@ Android Gradle performance auditor and auto-fixer.
 
 Audit and safely fix common Gradle build-time misconfigurations in Android projects.
 
+## What's new in 2.0
+- **AI-powered build analysis** via LLM (`npx droidperf analyze`)
+- **Auto-apply fixes** with `--apply`
+- **Dry-run preview** for AI fixes with `--dry-run`
+- **Save report** to `droidperf-report.md` for team sharing
+
 It’s designed to be boring in the best way: conservative fixes, transparent diffs, and easy rollback.
 
 ## Design Philosophy
@@ -16,6 +22,23 @@ It’s designed to be boring in the best way: conservative fixes, transparent di
 - Avoid modifying build scripts directly (only gradle.properties)
 - Focus on high-impact, low-risk improvements first
   
+## Demo
+
+### 1. Analyze your build
+```bash
+npx droidperf analyze --build-log ./build.log
+```
+
+### 2. Preview fixes before applying
+```bash
+npx droidperf analyze --build-log ./build.log --apply --dry-run
+```
+
+### 3. Apply fixes automatically
+```bash
+npx droidperf analyze --build-log ./build.log --apply
+```
+
 ## Quickstart
 
 ```bash
@@ -133,6 +156,23 @@ npx droidperf fix /path/to/your/android/project --only configuration-cache,build
 npx droidperf fix /path/to/your/android/project --exclude jvm-heap
 ```
 
+- **LLM Build Analysis (Beta)**:
+  Analyze a Gradle build log to find bottlenecks using an LLM.
+
+```bash
+# Set key once
+npx droidperf config --set-key your-key
+
+# Run analysis (auto-detects build.log)
+npx droidperf analyze
+
+# Run analysis and apply recommended fixes automatically
+npx droidperf analyze --apply
+
+# Use a specific model
+npx droidperf analyze --model openai/gpt-4o
+```
+
 - **Machine-readable output (CI)**:
 
 ```bash
@@ -190,6 +230,9 @@ See [`SECURITY.md`](./SECURITY.md).
 ## Maintainer
 
 Maintained by **Rudra Dave**.
+
+Built by a senior Android/KMP engineer.
+Open to remote roles → [github.com/rudradave1](https://github.com/rudradave1)
 
 - **Issues**: use GitHub Issues for bugs/features
 - **Security**: see [`SECURITY.md`](./SECURITY.md)

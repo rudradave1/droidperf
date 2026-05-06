@@ -2,32 +2,14 @@
 
 const path = require('path');
 const fs = require('fs/promises');
-const { ensureDir, writeFileAtomic } = require('../utils/fs');
+const { ensureDir, writeFileAtomic, backupFile } = require('../utils/fs');
 const { parseGradleProperties, getProp, setProp, stringifyGradleProperties } = require('../utils/gradleProperties');
 const { patchGradleJvmargs } = require('../utils/jvmargs');
 const { unifiedDiff } = require('../utils/diff');
 
-function timestamp() {
-  const d = new Date();
-  const pad = (n) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(
-    d.getSeconds()
-  )}`;
-}
-
 function lineCount(text) {
   if (!text) return 0;
   return String(text).split(/\r?\n/).length;
-}
-
-async function backupFile({ projectPath, filePath, content }) {
-  const backupDir = path.join(projectPath, '.droidperf-backup');
-  await ensureDir(backupDir);
-  const ts = timestamp();
-  const base = path.basename(filePath);
-  const backupPath = path.join(backupDir, `${base}.${ts}.bak`);
-  await fs.writeFile(backupPath, content, 'utf8');
-  return backupPath;
 }
 
 async function applyFixes({ project, results, dryRun }) {

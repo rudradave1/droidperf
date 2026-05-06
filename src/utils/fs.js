@@ -39,6 +39,24 @@ function isProbablyGradleDirName(name) {
   );
 }
 
+function timestamp() {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(
+    d.getSeconds()
+  )}`;
+}
+
+async function backupFile({ projectPath, filePath, content }) {
+  const backupDir = path.join(projectPath, '.droidperf-backup');
+  await ensureDir(backupDir);
+  const ts = timestamp();
+  const base = path.basename(filePath);
+  const backupPath = path.join(backupDir, `${base}.${ts}.bak`);
+  await fs.writeFile(backupPath, content, 'utf8');
+  return backupPath;
+}
+
 async function walkFiles(rootDir, { shouldIncludeFile, shouldSkipDir } = {}) {
   const results = [];
   const stack = [rootDir];
@@ -74,5 +92,6 @@ module.exports = {
   readFileIfExists,
   walkFiles,
   writeFileAtomic,
+  backupFile,
 };
 
