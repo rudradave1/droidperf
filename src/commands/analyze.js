@@ -7,6 +7,8 @@ const { getGlobalApiKey } = require('../config/globalConfig');
 const { pathExists, backupFile, writeFileAtomic } = require('../utils/fs');
 const { parseGradleProperties, setProp, stringifyGradleProperties } = require('../utils/gradleProperties');
 const { unifiedDiff } = require('../utils/diff');
+const { parseGradleLog } = require('../utils/logParser');
+const { getRelevantKnowledge } = require('../knowledge/gradlePatterns');
 
 async function findBuildLog(searchDir) {
   const candidates = [
@@ -85,10 +87,14 @@ async function analyzeCommand(opts) {
     return;
   }
 
-  console.log(chalk.blue(`🚀 Analyzing ${path.basename(logPath)} with OpenRouter LLM...`));
+  console.log(chalk.blue(`🚀 Pre-processing ${path.basename(logPath)}...`));
+  const buildMetrics = parseGradleLog(logContent);
+  const expertKnowledge = getRelevantKnowledge(logContent);
+
+  console.log(chalk.blue(`🚀 Analyzing with OpenRouter LLM (${modelOpt || 'openrouter/auto'})...`));
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 60000); // Increased to 60s for LLM processing
+  const timeout = setTimeout(() => controller.abort(), 60000);
 
   try {
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -101,11 +107,14 @@ async function analyzeCommand(opts) {
         'X-Title': 'droidperf',
       },
       body: JSON.stringify({
-        model: modelOpt || 'openrouter/free',
+        model: modelOpt || 'openrouter/auto',
         messages: [
           {
             role: 'system',
-            content: `You are an Android build performance expert. Analyze Gradle build logs to find bottlenecks and provide actionable fixes.
+            content: `You are an Android build performance expert. Analyze the provided build metrics and relevant expert knowledge to find bottlenecks.
+
+Expert Knowledge for this build:
+${expertKnowledge.map(k => `- ${k}`).join('\n') || 'None specificly identified.'}
 
 You must end your response with a FIX_JSON block in this exact format, no exceptions:
 
@@ -122,7 +131,19 @@ Do not add any text after the FIX_JSON block.`,
           },
           {
             role: 'user',
-            content: `Analyze this Gradle build log and find the top 3 bottlenecks. For each, provide an exact fix with a code snippet and estimated time saved per fix.
+            content: `Analyze these build metrics and find the top 3 bottlenecks.
+
+Build Summary: ${buildMetrics.summary}
+Configuration Time: ${buildMetrics.configTime || 'Unknown'}
+Total Time: ${buildMetrics.totalTime || 'Unknown'}
+
+Slowest Tasks:
+${buildMetrics.slowTasks.map(t => `- ${t.path}: ${t.duration}s`).join('\n')}
+
+Detected Warnings:
+${buildMetrics.warnings.map(w => `- ${w}`).join('\n') || 'None'}
+
+Provide an exact fix for each bottleneck with a code snippet and estimated time saved.
 
 Target format:
 Top 3 bottlenecks found
@@ -131,10 +152,7 @@ Top 3 bottlenecks found
    - Code: [Snippet]
    - Saved: [Time]
 2. ...
-3. ...
-
-Build Log (partial):
-${logContent.slice(-20000)}`,
+3. ...`,
           },
         ],
       }),
@@ -191,6 +209,7 @@ ${logContent.slice(-20000)}`,
               filePath: 'gradle.properties',
               beforeText: content,
               afterText: updatedContent,
+              context: 3
             });
             console.log(chalk.cyan('\n🔍 Dry run: Preview of changes to gradle.properties:'));
             console.log(diff);

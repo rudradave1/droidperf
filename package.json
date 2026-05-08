@@ -1,6 +1,6 @@
 {
   "name": "droidperf",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Android build performance audit tool",
   "author": "Rudra Dave",
   "homepage": "https://github.com/rudradave1/droidperf#readme",

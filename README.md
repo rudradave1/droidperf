@@ -8,6 +8,11 @@ Android Gradle performance auditor and auto-fixer.
 
 Audit and safely fix common Gradle build-time misconfigurations in Android projects.
 
+## What's new in 2.1
+- **Smart Log Pre-processing**: Extracts the slowest tasks and key metrics to fit any build size into the LLM context.
+- **Expert Knowledge Base (RAG)**: Automatically injects relevant Gradle performance patterns into the AI prompt for deeper insights.
+- **Improved Accuracy**: More structured, data-driven analysis with lower token usage.
+
 ## What's new in 2.0
 - **AI-powered build analysis** via LLM (`npx droidperf analyze`)
 - **Auto-apply fixes** with `--apply`
@@ -226,6 +231,13 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 ## Security
 
 See [`SECURITY.md`](./SECURITY.md).
+
+## Roadmap
+
+See the [upcoming features](https://github.com/rudradave1/droidperf/issues):
+- **Local LLM Support**: Integration with Ollama for offline analysis.
+- **Visual Timelines**: Mermaid.js charts generated from build logs.
+- **Project Structure Analysis**: Deep scan of `build.gradle` files to suggest modularization.
 
 ## Maintainer
 
