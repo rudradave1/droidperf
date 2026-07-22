@@ -1,7 +1,3 @@
+.idea/
 node_modules/
-.DS_Store
-.droidperf-backup/
-npm-debug.log*
-.env
-.droidperf/
-npmignore
+package-lock.json

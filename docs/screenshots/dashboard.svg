@@ -1,0 +1,21 @@
+<svg width="1200" height="700" viewBox="0 0 1200 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="700" rx="24" fill="#07111F"/>
+  <rect x="50" y="48" width="1100" height="604" rx="20" fill="#0B1728" stroke="#1F2937"/>
+  <rect x="80" y="80" width="300" height="40" rx="10" fill="#111827"/>
+  <rect x="840" y="80" width="280" height="40" rx="10" fill="#111827"/>
+  <rect x="80" y="150" width="1040" height="220" rx="18" fill="#111827" stroke="#273449"/>
+  <rect x="110" y="182" width="180" height="16" rx="8" fill="#6366F1"/>
+  <rect x="110" y="214" width="420" height="14" rx="7" fill="#374151"/>
+  <rect x="110" y="242" width="340" height="14" rx="7" fill="#374151"/>
+  <rect x="110" y="270" width="260" height="14" rx="7" fill="#374151"/>
+  <rect x="780" y="180" width="220" height="150" rx="18" fill="#0F172A" stroke="#273449"/>
+  <rect x="80" y="400" width="480" height="180" rx="18" fill="#111827" stroke="#273449"/>
+  <rect x="590" y="400" width="530" height="180" rx="18" fill="#111827" stroke="#273449"/>
+  <rect x="110" y="440" width="140" height="14" rx="7" fill="#10B981"/>
+  <rect x="110" y="472" width="310" height="12" rx="6" fill="#374151"/>
+  <rect x="110" y="500" width="280" height="12" rx="6" fill="#374151"/>
+  <rect x="620" y="440" width="160" height="14" rx="7" fill="#06B6D4"/>
+  <rect x="620" y="472" width="370" height="12" rx="6" fill="#374151"/>
+  <rect x="620" y="500" width="330" height="12" rx="6" fill="#374151"/>
+  <text x="80" y="642" fill="#94A3B8" font-family="Arial, sans-serif" font-size="24">Web UI: paste a log, inspect metrics, and apply fixes</text>
+</svg>

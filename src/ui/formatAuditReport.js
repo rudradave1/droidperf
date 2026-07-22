@@ -26,6 +26,8 @@ function padSeverity(sev) {
   return (sev + ' '.repeat(w)).slice(0, w);
 }
 
+const Table = require('cli-table3');
+
 function formatAuditReport({ projectPath, results, chalk, buildsPerDay }) {
   const failing = results.filter((r) => r.status === 'fail');
   const totalSavingsSec = failing.reduce((sum, r) => sum + (r.estimatedSeconds || 0), 0);
@@ -34,9 +36,7 @@ function formatAuditReport({ projectPath, results, chalk, buildsPerDay }) {
   const wasteMinutesPerDay = (totalSavingsSec / 60) * bpd;
 
   const lines = [];
-  
-  const header = chalk ? chalk.bold('Project Health Report') : 'Project Health Report';
-  lines.push(header);
+  lines.push(chalk ? chalk.bold('Project Health Report') : 'Project Health Report');
   lines.push('');
   lines.push(`Issues found: ${failing.length}`);
   if (failing.length > 0) {
@@ -44,35 +44,20 @@ function formatAuditReport({ projectPath, results, chalk, buildsPerDay }) {
   }
   lines.push('');
 
-  if (failing.length === 0) {
-    lines.push('No issues found. Your project looks well-tuned.');
-  } else {
-    lines.push('Top issues:');
+  if (failing.length > 0) {
+    const table = new Table({
+        head: ['Issue', 'Severity', 'Impact'],
+        colWidths: [40, 10, 15]
+    });
+
     const ordered = [...failing].sort((a, b) => (b.estimatedSeconds || 0) - (a.estimatedSeconds || 0));
-    
-    // Show top 3 or 4 issues
-    const top = ordered.slice(0, 4);
-    for (const r of top) {
-      lines.push(`- ${r.title}`);
+    for (const r of ordered.slice(0, 5)) {
+        table.push([r.title.slice(0, 38), r.severity, formatSeconds(r.estimatedSeconds || 0)]);
     }
-    
-    if (ordered.length > top.length) {
-      lines.push(`- ... and ${ordered.length - top.length} more`);
-    }
-
+    lines.push(table.toString());
     lines.push('');
-    
-    const hasCritical = failing.some(r => r.severity === 'CRITICAL');
-    const hasHigh = failing.some(r => r.severity === 'HIGH');
-    
-    let priority = 'LOW';
-    if (hasCritical) priority = 'CRITICAL';
-    else if (hasHigh) priority = 'HIGH';
-    else if (failing.some(r => r.severity === 'MEDIUM')) priority = 'MEDIUM';
-
-    const prioText = chalk ? severityColor(chalk, priority)(priority) : priority;
-    lines.push(`Recommendation: ${prioText} priority fix`);
-    lines.push(`Run 'droidperf fix' to apply all fixes automatically.`);
+  } else {
+    lines.push('No issues found. Your project looks well-tuned.');
   }
 
   return lines.join('\n');

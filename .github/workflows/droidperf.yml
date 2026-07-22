@@ -1,0 +1,9 @@
+name: Droidperf
+on: [pull_request]
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Droidperf Audit
+        uses: ./.github/actions/droidperf

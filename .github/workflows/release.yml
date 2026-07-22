@@ -1,6 +1,7 @@
 name: Release (npm publish)
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - "v*.*.*"
@@ -25,6 +26,9 @@ jobs:
 
       - name: Test
         run: npm test
+
+      - name: Build Docker image
+        run: docker build -t droidperf:${GITHUB_REF_NAME} .
 
       - name: Publish
         env:

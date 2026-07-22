@@ -1,0 +1,22 @@
+<svg width="1200" height="700" viewBox="0 0 1200 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="700" rx="24" fill="#07111F"/>
+  <rect x="40" y="40" width="1120" height="620" rx="20" fill="#0B1728" stroke="#1F2937"/>
+  <rect x="70" y="80" width="240" height="36" rx="10" fill="#111827"/>
+  <rect x="70" y="140" width="460" height="18" rx="9" fill="#1F2937"/>
+  <rect x="70" y="170" width="370" height="18" rx="9" fill="#1F2937"/>
+  <rect x="70" y="220" width="320" height="220" rx="16" fill="#111827" stroke="#273449"/>
+  <rect x="90" y="250" width="150" height="12" rx="6" fill="#6366F1"/>
+  <rect x="90" y="278" width="220" height="12" rx="6" fill="#3B82F6"/>
+  <rect x="90" y="306" width="180" height="12" rx="6" fill="#06B6D4"/>
+  <rect x="90" y="334" width="200" height="12" rx="6" fill="#10B981"/>
+  <rect x="430" y="220" width="300" height="220" rx="16" fill="#111827" stroke="#273449"/>
+  <rect x="452" y="248" width="120" height="14" rx="7" fill="#F59E0B"/>
+  <rect x="452" y="278" width="250" height="12" rx="6" fill="#374151"/>
+  <rect x="452" y="306" width="210" height="12" rx="6" fill="#374151"/>
+  <rect x="452" y="336" width="180" height="12" rx="6" fill="#374151"/>
+  <rect x="70" y="470" width="660" height="120" rx="16" fill="#111827" stroke="#273449"/>
+  <rect x="90" y="498" width="600" height="12" rx="6" fill="#374151"/>
+  <rect x="90" y="526" width="520" height="12" rx="6" fill="#374151"/>
+  <rect x="90" y="554" width="440" height="12" rx="6" fill="#374151"/>
+  <text x="70" y="640" fill="#94A3B8" font-family="Arial, sans-serif" font-size="24">CLI: npx droidperf audit /path/to/project</text>
+</svg>

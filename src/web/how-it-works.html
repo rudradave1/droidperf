@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How droidperf works</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07111f;
+      --panel: rgba(10, 20, 35, 0.9);
+      --border: rgba(255,255,255,0.12);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #6366f1;
+      --accent-2: #06b6d4;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at top, rgba(99,102,241,0.16), transparent 42%), var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    main { max-width: 960px; margin: 0 auto; padding: 3rem 1.25rem 4rem; }
+    .hero, .card { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; backdrop-filter: blur(14px); }
+    .hero { padding: 2rem; margin-bottom: 1.25rem; }
+    .hero h1 { font-size: clamp(2rem, 3.5vw, 2.9rem); margin: 0 0 0.6rem; }
+    .hero p { color: var(--muted); font-size: 1.05rem; max-width: 740px; }
+    .card { padding: 1.4rem 1.5rem; margin-bottom: 1rem; }
+    .steps { display: grid; gap: 0.8rem; padding-left: 1rem; }
+    .pill { display: inline-block; padding: 0.28rem 0.7rem; border-radius: 999px; background: rgba(99,102,241,0.16); color: #dbeafe; font-size: 0.8rem; margin-bottom: 0.75rem; }
+    a { color: #c7d2fe; }
+    .footer { color: var(--muted); font-size: 0.95rem; padding-top: 0.8rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <span class="pill">Fast, safe Gradle tuning</span>
+      <h1>How droidperf works</h1>
+      <p>droidperf inspects your Android Gradle builds, highlights bottlenecks, and recommends conservative fixes that are easy to review and safe to roll back.</p>
+    </section>
+
+    <section class="card">
+      <h2>1. Inspect the build</h2>
+      <p>droidperf reads your build log or audits the project directly to detect slow configuration phases, caching gaps, parallelism issues, and other common hotspots.</p>
+    </section>
+
+    <section class="card">
+      <h2>2. Recommend targeted fixes</h2>
+      <p>It turns those findings into low-risk actions such as enabling build cache, parallel execution, or better JVM settings in gradle.properties.</p>
+    </section>
+
+    <section class="card">
+      <h2>3. Verify before shipping</h2>
+      <p>After applying changes, droidperf re-runs Gradle help verification and reverts changes if the build structure becomes invalid.</p>
+    </section>
+
+    <section class="card">
+      <h2>4. Use it in the CLI or browser</h2>
+      <ul class="steps">
+        <li>CLI: <code>npx droidperf audit /path/to/project</code></li>
+        <li>Analyze logs: <code>npx droidperf analyze --build-log ./build.log --local</code></li>
+        <li>Dashboard: <code>npx droidperf ui</code></li>
+      </ul>
+    </section>
+
+    <p class="footer"><a href="/">Return to the dashboard</a></p>
+  </main>
+</body>
+</html>

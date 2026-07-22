@@ -141,14 +141,15 @@ function getRules(project, options = {}) {
   const recommendXmxMb = options.recommend?.jvmXmxMb ?? 4096;
 
   // Analysis for advanced rules
-  let hasKapt = false;
+  let hasKaptInBuildFile = false;
   let hasUnoptimizedDebug = false;
   
   for (const f of project.buildFiles) {
     if (!f.text) continue;
     // Check for KAPT
-    if (f.text.includes('kotlin-kapt') || f.text.includes('org.jetbrains.kotlin.kapt')) {
-      hasKapt = true;
+    const kaptRegex = /(kotlin-kapt|org\.jetbrains\.kotlin\.kapt)/;
+    if (kaptRegex.test(f.text)) {
+      hasKaptInBuildFile = true;
     }
     // Check for unoptimized debug (e.g. debug block exists but missing crunchPngs = false)
     if (f.text.includes('debug {')) {
@@ -349,7 +350,7 @@ function getRules(project, options = {}) {
       estimatedSeconds: 40,
       title: 'KAPT is used instead of KSP',
       audit() {
-        const ok = !hasKapt;
+        const ok = !hasKaptInBuildFile;
         return makeResult({
           id: this.id,
           title: this.title,

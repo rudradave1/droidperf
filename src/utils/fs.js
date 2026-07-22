@@ -86,6 +86,17 @@ async function walkFiles(rootDir, { shouldIncludeFile, shouldSkipDir } = {}) {
   return results;
 }
 
+async function getGradleCommand(projectPath) {
+  const isWin = process.platform === 'win32';
+  const wrapper = isWin ? 'gradlew.bat' : './gradlew';
+  const wrapperFile = isWin ? 'gradlew.bat' : 'gradlew';
+  const wrapperPath = path.join(projectPath, wrapperFile);
+  if (await pathExists(wrapperPath)) {
+    return wrapper;
+  }
+  return 'gradle';
+}
+
 module.exports = {
   ensureDir,
   pathExists,
@@ -93,5 +104,6 @@ module.exports = {
   walkFiles,
   writeFileAtomic,
   backupFile,
+  getGradleCommand,
 };
 
